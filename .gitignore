@@ -9,7 +9,6 @@
 *.fig
 *.edf
 *.asv
-*.txt
 *.dat
 *.jpg
 *.avi

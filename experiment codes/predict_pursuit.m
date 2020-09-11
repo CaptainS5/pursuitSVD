@@ -73,7 +73,7 @@ try
     [edfFile,outputDir] = inputCreateDirectory(subDir);
     
     fileID = fopen(strcat(outputDir,'\','SLog_',edfFile),'w');
-    fprintf(fileID,'%4s %4s %8s %7s %3s \n','trial','velocity','duration','direction','blankStart','blankEnd');
+    fprintf(fileID,'%4s %4s %8s %7s %3s \n','trial','velocity','duration','direction','blankStart','blankEnd'); % hmmm.... bug here= =
     %%%%%%%%%%
     % STEP 2 %
     %%%%%%%%%%
