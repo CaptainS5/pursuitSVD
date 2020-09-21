@@ -60,8 +60,7 @@ if strcmp(name, 'smoothPursuit')
     line([trial.target.onset trial.target.onset], [-25 25],'Color','k','LineStyle',':');
     line([trial.target.offset trial.target.offset], [-25 25],'Color','k','LineStyle',':');
     
-else
-    %anticipatory pursuit will probably go here
+elseif strcmp(name, 'predictivePursuit')
     
 end
 end

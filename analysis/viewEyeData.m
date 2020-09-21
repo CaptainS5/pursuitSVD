@@ -77,6 +77,10 @@ elseif strcmp(name, 'smoothPursuit')
     load('targetPosition.mat');
     cd(analysisPath);
     errors = load('errors_pursuit.csv');
+elseif strcmp(name, 'predictivePursuit')
+    load('targetPosition.mat');
+    cd(analysisPath);
+%     errors = load('errors_pursuit.csv');
 end
 
 
@@ -123,12 +127,19 @@ elseif strcmp(name, 'smoothPursuit')
     
     buttons.discardTrial = uicontrol(fig,'string','!Discard Trial!','Position',[20,700,100,30],...
         'callback', 'currentTrial = currentTrial;analyzeTrialPursuit;plotResultsPursuit; markErrorPursuit');
- 
+elseif strcmp(name, 'predictivePursuit')
+    analyzeTrialPursuit;
+    plotResultsPursuit;
+    
+    buttons.previous = uicontrol(fig,'string','<< Previous','Position',[0,50,100,30],...
+        'callback','clc; currentTrial = max(currentTrial-1,1);analyzeTrialPursuit;plotResultsPursuit');
+    
+    buttons.next = uicontrol(fig,'string','Next (0) >>','Position',[0,85,100,30],...
+        'callback','clc; currentTrial = currentTrial+1;analyzeTrialPursuit;plotResultsPursuit;finishButton');
+    
+    buttons.discardTrial = uicontrol(fig,'string','!Discard Trial!','Position',[20,700,100,30],...
+        'callback', 'currentTrial = currentTrial;analyzeTrialPursuit;plotResultsPursuit; markErrorPredictivePursuit');    
 end
-
-
-
-
 
 clear listboxDataFiles;
 clear listboxLogFiles;

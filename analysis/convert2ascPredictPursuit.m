@@ -10,7 +10,6 @@ currentSubject = {};
 
 
 %% Loop over all subjects
-
 for i = 3:length(folderNames)
     currentSubject{i-2} = folderNames(i).name;
     
@@ -22,36 +21,30 @@ for i = 3:length(folderNames)
     cd(startFolder);
     ascfiles = dir([currentFolder '\*.asc']);
     
-    %% needs to modify from here
+    targetPosition = table();    
     for j = 1:length(ascfiles)
         ascfile = ascfiles(j).name;
         path = fullfile(currentFolder, ascfile);
         fid = fopen(path);
-        allEntries = textscan(fid, '%s','delimiter','\n');
-        startLabel = strfind(allEntries{:}, 'MODE RECORD');
-        header = find(not(cellfun('isempty', startLabel)));
-        targetLabel = strfind(allEntries{:}, 'SYNCTIME');
-        targetPositionIdx = find(not(cellfun('isempty', targetLabel)));
-        targetOnset = targetPositionIdx(1) - header;
-%         for k = 1:length(targetPositionIdx)
-%             edfEntry = allEntries{1,1}(targetPositionIdx(k));
-%             timeStamp = str2double(edfEntry{1}(5:11));
-%             startIdx = strfind(edfEntry, '(');
-%             breakIdx = strfind(edfEntry, ',');
-%             stopIdx = strfind(edfEntry, ')');
-%             xPos = str2double(edfEntry{1}(startIdx{1}+1:breakIdx{1}-1));
-%             yPos = str2double(edfEntry{1}(breakIdx{1}+1:stopIdx{1}-1));
-%             currentTargetPosition(k,:) = [timeStamp xPos yPos]; 
-%         end
-        name = {['trial' num2str(j)]};
-        targetPosition.(name{1}) = targetOnset;
-        freqLabel = strfind(allEntries{:}, 'freq_x');
-        frequencyIdx = allEntries{1,1}(find(not(cellfun('isempty', freqLabel)))); 
-        frequency(j) = str2double(frequencyIdx{1,1}(end-5:end-1));
+        allEntries = textscan(fid, '%s %s %s %s %s %s %s %*[^\n]');
+        
+        frameCount = 1;
+        % find info about target position and blank timing? here
+        for lineN = 1:size(allEntries{1}, 1)
+            if strcmp(allEntries{1}{lineN}, 'MSG')
+                if strcmp(allEntries{3}{lineN}, 'TRIALID')
+                    trialN = str2num(allEntries{4}{lineN});
+                elseif strcmp(allEntries{3}{lineN}, '!V') && strcmp(allEntries{4}{lineN}, 'TARGET_POS')
+                    targetPosition.time(trialN, frameCount) = str2num(allEntries{2}{lineN});
+                    targetPosition.posX(trialN, frameCount) = str2num(allEntries{6}{lineN}(2:end-1)); 
+                    targetPosition.posY(trialN, frameCount) = str2num(allEntries{7}{lineN}(1:end-1));
+                    frameCount = frameCount+1;
+                end
+            end
+        end
         fclose(fid);
     end
     cd(currentFolder)
-    targetPosition.frequency = frequency;
     save('targetPosition', 'targetPosition')
     
     cd(startFolder)
