@@ -8,10 +8,10 @@ eyeData = processEyeData(eyeData); % equivalent to socscalexy
 
 %% Target data
 % set up target file
-target = createTargetData(targetPosition, ascFile, eyeData, str2double(currentSubject(end-2:end)));
+target = createTargetData(targetPosition, ascFile, eyeData, str2double(currentSubject(end-2:end)), name);
 
 %% setup trial
-trial = readoutTrialPursuit(ascFile, eyeData, currentSubject, target); 
+trial = readoutTrialPursuit(ascFile, eyeData, currentSubject, target, log, name); 
 
 %% find saccades
 thresholdMoveDirection = 10;%evalin('base', 'saccadeThreshold');

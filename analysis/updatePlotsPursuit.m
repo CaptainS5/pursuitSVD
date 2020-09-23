@@ -61,6 +61,71 @@ if strcmp(name, 'smoothPursuit')
     line([trial.target.offset trial.target.offset], [-25 25],'Color','k','LineStyle',':');
     
 elseif strcmp(name, 'predictivePursuit')
-    
+    %% position over time
+    yRangePos = [-15 15];
+    subplot(2,1,1,'replace');
+    axis([startFrame endFrame yRangePos]);
+    hold on;
+    xlabel('Time(ms)', 'fontsize', 12);
+    ylabel('Position (degree)', 'fontsize', 12);
+    % plot eye and target position
+    plot(startFrame:endFrame,trial.eye.X_filt(startFrame:endFrame),'Color', green);
+    plot(startFrame:length(trial.target.X),trial.target.X(1:end),'Color', green, 'LineStyle', '--');
+    plot(startFrame:endFrame,trial.eye.Y_filt(startFrame:endFrame),'b');
+    plot(startFrame:length(trial.target.Y),trial.target.Y(1:end),'b', 'LineStyle', '--');
+    legend({'x eye', 'x target', 'y eye', 'y target'}, 'location', 'northwest');
+    % add saccades
+    if sum(trial.target.X) == 0
+        plot(trial.saccades.onsets,trial.eye.Y_filt(trial.saccades.onsets),'g*');
+        plot(trial.saccades.offsets,trial.eye.Y_filt(trial.saccades.offsets),'m*');
+    elseif sum(trial.target.Y) == 0
+        plot(trial.saccades.onsets,trial.eye.X_filt(trial.saccades.onsets),'g*');
+        plot(trial.saccades.offsets,trial.eye.X_filt(trial.saccades.offsets),'m*');
+    end
+    % indicate blinks
+    for i = 1:length(trial.saccades.blinkOnsets)
+        line([trial.saccades.blinkOnsets(i) trial.saccades.blinkOffsets(i)], [0 0],'Color','r', 'LineWidth', 2);
+    end
+    % indicate target on and offset
+    line([trial.target.onset trial.target.onset], yRangePos,'Color','k','LineStyle','--');
+    line([trial.target.offset trial.target.offset], yRangePos,'Color','k','LineStyle','--');
+    % indicate blank start and end
+    if trial.log.blank==1
+        line([trial.log.blankStart trial.log.blankStart], yRangePos,'Color','b','LineStyle','--');
+        line([trial.log.blankEnd trial.log.blankEnd], yRangePos,'Color','b','LineStyle','--');
+    end
+        
+    %% velocity over time
+    yRangeVel = [-25 25];
+    subplot(2,1,2,'replace');
+    axis([startFrame endFrame yRangeVel]);
+    hold on;
+    xlabel('Time(ms)', 'fontsize', 12);
+    ylabel('Speed (degree/second)', 'fontsize', 12);
+    % plot eye and target velocity
+    plot(startFrame:endFrame,trial.eye.DX_filt(startFrame:endFrame),'Color', green);
+    plot(startFrame:length(trial.target.Xvel),trial.target.Xvel(1:end),'Color', green, 'LineStyle', '--');
+    plot(startFrame:endFrame,trial.eye.DY_filt(startFrame:endFrame),'b');
+    plot(startFrame:length(trial.target.Yvel),trial.target.Yvel(1:end),'b', 'LineStyle', '--');
+    % add saccades
+    if sum(trial.target.X) == 0
+        plot(trial.saccades.onsets,trial.eye.DY_filt(trial.saccades.onsets),'g*');
+        plot(trial.saccades.offsets,trial.eye.DY_filt(trial.saccades.offsets),'m*');
+    elseif sum(trial.target.Y) == 0
+        plot(trial.saccades.onsets,trial.eye.DX_filt(trial.saccades.onsets),'g*');
+        plot(trial.saccades.offsets,trial.eye.DX_filt(trial.saccades.offsets),'m*');
+    end
+    % indicate blinks
+    for i = 1:length(trial.saccades.blinkOnsets)
+        line([trial.saccades.blinkOnsets(i) trial.saccades.blinkOffsets(i)], [0 0],'Color','r', 'LineWidth', 2);
+    end
+    % indicate target on and offset
+    line([trial.target.onset trial.target.onset], yRangeVel,'Color','k','LineStyle','--');
+    line([trial.target.offset trial.target.offset], yRangeVel,'Color','k','LineStyle','--');
+    % indicate blank start and end
+    if trial.log.blank==1
+        line([trial.log.blankStart trial.log.blankStart], yRangeVel,'Color','b','LineStyle','--');
+        line([trial.log.blankEnd trial.log.blankEnd], yRangeVel,'Color','b','LineStyle','--');
+    end
 end
 end

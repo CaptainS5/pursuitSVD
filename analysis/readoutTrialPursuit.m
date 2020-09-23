@@ -1,6 +1,10 @@
-function [trial] = readoutTrialPursuit(ascFile, eyeData, currentSubject, target)
+function [trial] = readoutTrialPursuit(ascFile, eyeData, currentSubject, target, log, task)
 
-trial.number = str2double(ascFile(end-5:end-4));
+if strcmp(task, 'smoothPursuit')
+    trial.number = str2double(ascFile(end-5:end-4));
+elseif strcmp(task, 'predictivePursuit')
+    trial.number = str2double(ascFile(end-6:end-4));
+end
 name = evalin('base', 'name');
 %% get eyeData for this trial
 trial.eye.X = eyeData.X;
@@ -53,6 +57,26 @@ if strcmp(name, 'smoothPursuit')
     trial.target.maxima = target.cycle.maxima;
     trial.target.minima = target.cycle.minima;
     trial.target.crossings = target.cycle.crossing;
+elseif strcmp(name, 'predictivePursuit')
+    trial.target.onset = target.onset;
+    trial.target.offset = target.offset;
+    trial.target.X = target.Xdeg;
+    trial.target.Y = target.Ydeg;
+    trial.target.Xvel = target.Xvel;
+    trial.target.Yvel = target.Yvel;
+    trial.target.Xpix = target.Xpxl;
+    trial.target.Ypix = target.Ypxl;
+    trial.target.speed = ceil(max(sqrt(trial.target.Xvel.^2+trial.target.Yvel.^2)));
+    
+    blankStartFrames = ms2frames(log.blank(1)*1000); % from target onset
+    blankEndFrames = ms2frames(log.blank(2)*1000);
+    trial.log.blankStart = target.onset+blankStartFrames;
+    trial.log.blankEnd = target.onset+blankEndFrames;
+    if isempty(find(log.noBlank==trial.number))
+        trial.log.blank=1;
+    else
+        trial.log.blank=0;
+    end
 end
 
 end

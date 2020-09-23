@@ -55,6 +55,8 @@ else
 end   
 
 currentSubjectPath = selectSubject(dataPath);
+currentSubject = currentSubjectPath(end-3:end);
+targetSelectionAdj = [];
 
 cd(currentSubjectPath);
 numTrials = length(dir('*.asc'));
@@ -79,13 +81,28 @@ elseif strcmp(name, 'smoothPursuit')
     errors = load('errors_pursuit.csv');
 elseif strcmp(name, 'predictivePursuit')
     load('targetPosition.mat');
+    for ii = 1:size(matFiles, 1)
+        matFileNames{ii} = matFiles(ii).name(end-11:end);
+    end
+    logIdx = find(strcmp(matFileNames, '_predict.mat'));
+    logFileName = matFiles(logIdx).name;
+    log = load(logFileName);
     cd(analysisPath);
-%     errors = load('errors_pursuit.csv');
+    % error file
+    errorFilePath = fullfile(analysisPath,'\ErrorFiles\');
+    if exist(errorFilePath, 'dir') == 0
+        % Make folder if it does not exist.
+        mkdir(errorFilePath);
+    end
+    errorFileName = [errorFilePath 'Sub_' currentSubject '_errorFile.mat'];
+    try
+        load(errorFileName);
+        disp('Error file loaded');
+    catch  %#ok<CTCH>
+        errorStatus = NaN(size(targetPosition.time, 1), 1);
+        disp('No error file found. Created a new one.');
+    end
 end
-
-
-currentSubject = currentSubjectPath(end-3:end);
-targetSelectionAdj = [];
 
 %% open window to plot in
 screenSize = get(0,'ScreenSize');
@@ -131,14 +148,21 @@ elseif strcmp(name, 'predictivePursuit')
     analyzeTrialPursuit;
     plotResultsPursuit;
     
-    buttons.previous = uicontrol(fig,'string','<< Previous','Position',[0,50,100,30],...
+    buttons.exitAndSave = uicontrol(fig,'string','Exit & Save','Position',[0,35,100,30],...
+        'callback', 'close(fig);save(errorFileName,''errorStatus'');');
+    buttons.exit = uicontrol(fig,'string','Exit','Position',[0,5,100,30],...
+        'callback','close(fig);');
+    buttons.jumpToTrialn = uicontrol(fig,'string','Jump to trial..','Position',[0,70,100,30],...
+        'callback','inputTrial = inputdlg(''Go to trial:'');currentTrial = str2num(inputTrial{:});analyzeTrialPursuit;plotResultsPursuit;');
+    
+    buttons.previous = uicontrol(fig,'string','<< Previous','Position',[0,100,100,30],...
         'callback','clc; currentTrial = max(currentTrial-1,1);analyzeTrialPursuit;plotResultsPursuit');
     
-    buttons.next = uicontrol(fig,'string','Next (0) >>','Position',[0,85,100,30],...
-        'callback','clc; currentTrial = currentTrial+1;analyzeTrialPursuit;plotResultsPursuit;finishButton');
+    buttons.next = uicontrol(fig,'string','Next (0) >>','Position',[0,130,100,30],...
+        'callback','clc; errorStatus(currentTrial)=0; currentTrial = currentTrial+1; analyzeTrialPursuit; plotResultsPursuit;finishButton');
     
-    buttons.discardTrial = uicontrol(fig,'string','!Discard Trial!','Position',[20,700,100,30],...
-        'callback', 'currentTrial = currentTrial;analyzeTrialPursuit;plotResultsPursuit; markErrorPredictivePursuit');    
+    buttons.discardTrial = uicontrol(fig,'string','!Discard Trial!','Position',[0,400,100,30],...
+        'callback', 'errorStatus(currentTrial)=1; currentTrial = currentTrial+1; analyzeTrialPursuit; plotResultsPursuit');
 end
 
 clear listboxDataFiles;
