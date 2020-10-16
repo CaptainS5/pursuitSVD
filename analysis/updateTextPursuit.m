@@ -2,7 +2,7 @@ function [] = updateTextPursuit(trial, fig, choice, name)
 
 screenSize = get(0,'ScreenSize');
 xPosition = 10; %screenSize(3)*2/3-50;
-yPosition = screenSize(4)-screenSize(4)/2; %screenSize(4)*2/5-50;
+yPosition = 270; %screenSize(4)-screenSize(4)/2; %screenSize(4)*2/5-50;
 verticalDistance = 20;
 width = 140 ;
 height = 20;
