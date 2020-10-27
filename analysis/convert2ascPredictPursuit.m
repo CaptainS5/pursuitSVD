@@ -10,11 +10,14 @@ if strcmp(folderNames(end).name(end-3:end), '.mat') % if already includes the ex
     folderNames(end) = [];
 end
 currentSubject = {};
-excludeList = {};
-excludeCount = 1;
+% if already have the exclude list and needs to rerun, load
+load([dataPath, 'excludeList.mat'])
+% if not having the exclude list, generate one
+% excludeList = {};
+% excludeCount = 1;
 
 %% Loop over all subjects
-for i = 3:length(folderNames)
+for i = 3:3%3:length(folderNames)
     currentSubject{i-2} = folderNames(i).name;  
     
     currentFolder = [dataPath currentSubject{i-2}];
@@ -29,12 +32,25 @@ for i = 3:length(folderNames)
             matFileNames{ii} = matFiles(ii).name(end-11:end);
         end
     end
-    if isempty(matFiles) || size(edfFiles, 1)<150 ...
-            || isempty(find(strcmp(matFileNames, '_predict.mat')))
-        excludeList{excludeCount} = currentSubject{i-2};
-        excludeCount = excludeCount+1;
+    % if already have the exclude list and needs to rerun, compare and ignore those who should
+    % be ignored...
+    excludeFlag = 0;
+    for ii = 1:size(excludeList, 2)
+        if strcmp(excludeList{ii}, currentSubject{i-2})
+            excludeFlag = 1;
+        end
+    end
+    if excludeFlag
         continue
     end
+    
+%     if isempty(matFiles) || size(edfFiles, 1)<150 ...
+%             || isempty(find(strcmp(matFileNames, '_predict.mat'))) % the
+%             first time, need to identify who should be excluded
+%         excludeList{excludeCount} = currentSubject{i-2};
+%         excludeCount = excludeCount+1;
+%         continue
+%     end
     
     [res, stat] = system([startFolder 'edf2asc -y ' currentFolder '\*.edf']);
     
@@ -74,4 +90,4 @@ for i = 3:length(folderNames)
     [res, stat] = system([startFolder 'edf2asc -y -s -miss 9999 -nflags ' currentFolder '\*.edf']);
 end
 cd(dataPath)
-save('excludeList.mat', 'excludeList')
+% save('excludeList.mat', 'excludeList')

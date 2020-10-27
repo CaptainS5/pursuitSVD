@@ -11,21 +11,20 @@ switch choice
     case 'controls'
         dataPath = fullfile(pwd, '..','data\controls\');
 end
-
-str = {'anti saccade', 'pro saccade', '1 minute saccades', 'smooth purusit', 'predictive pursuit'};
-
-[s,v] = listdlg('PromptString','Select an eye movement test:',...
-    'SelectionMode','single',...
-    'ListString',str);
+% comment out unnecessary codes for choosing the task since we only focus on predictive pursuit
+% str = {'anti saccade', 'pro saccade', '1 minute saccades', 'smooth purusit', 'predictive pursuit'};
+% 
+% [s,v] = listdlg('PromptString','Select an eye movement test:',...
+%     'SelectionMode','single',...
+%     'ListString',str);
     
-
 %% General definitions of the set up here!
 %  (should be changed, if e.g. the projector was moved, i.e. the size of
 %  the projective are changed. Distance should be fixed, but double
 %  checking doesn't hurt
 currentTrial = 1;
 % % For SVD testing at icord:
-sampleRate = 1000;
+% sampleRate = 1000;
 screenSizeX = 40.6;
 screenSizeY = 30.4;
 screenResX = 1600; 
@@ -37,22 +36,23 @@ microSaccadeThreshold = 5;
 %% Subject selection
 
 analysisPath = pwd;
-if s == 1 
-    dataPath = fullfile(dataPath, 'antiSac_data\');
-    name = 'antiSaccade';
-elseif s == 2
-    dataPath = fullfile(dataPath, 'proSac_data\');
-    name = 'proSaccade';
-elseif s == 3
-    dataPath = fullfile(dataPath, 'saccade_data\');
-    name = 'minuteSaccade';
-elseif s == 4
-    dataPath = fullfile(dataPath, 'pursuit_data\');
-    name = 'smoothPursuit';
-else
+% comment out unnecessary codes since we only focus on predictive pursuit
+% if s == 1 
+%     dataPath = fullfile(dataPath, 'antiSac_data\');
+%     name = 'antiSaccade';
+% elseif s == 2
+%     dataPath = fullfile(dataPath, 'proSac_data\');
+%     name = 'proSaccade';
+% elseif s == 3
+%     dataPath = fullfile(dataPath, 'saccade_data\');
+%     name = 'minuteSaccade';
+% elseif s == 4
+%     dataPath = fullfile(dataPath, 'pursuit_data\');
+%     name = 'smoothPursuit';
+% else
     dataPath = fullfile(dataPath, 'predict_pursuit_data\');
     name = 'predictivePursuit';
-end   
+% end   
 
 currentSubjectPath = selectSubject(dataPath);
 currentSubject = currentSubjectPath(end-3:end);
@@ -159,14 +159,14 @@ elseif strcmp(name, 'predictivePursuit')
         'callback','clc; currentTrial = max(currentTrial-1,1);analyzeTrialPursuit;plotResultsPursuit');
     
     buttons.next = uicontrol(fig,'string','Next (0) >>','Position',[0,130,100,30],...
-        'callback','clc; errorStatus(currentTrial)=0; currentTrial = currentTrial+1; analyzeTrialPursuit; plotResultsPursuit;finishButton');
+        'callback','clc; errorStatus(trial.number)=0; currentTrial = currentTrial+1; analyzeTrialPursuit; plotResultsPursuit;finishButton');
     
     buttons.discardTrial = uicontrol(fig,'string','!Discard Trial!','Position',[0,300,100,30],...
-        'callback', 'errorStatus(currentTrial)=1; currentTrial = currentTrial+1; analyzeTrialPursuit; plotResultsPursuit');
+        'callback', 'errorStatus(trial.number)=1; currentTrial = currentTrial+1; analyzeTrialPursuit; plotResultsPursuit');
     buttons.discardTrial = uicontrol(fig,'string','!Blink errors!','Position',[0,330,100,30],...
-        'callback', 'errorStatus(currentTrial)=2; currentTrial = currentTrial+1; analyzeTrialPursuit; plotResultsPursuit');
+        'callback', 'errorStatus(trial.number)=2; currentTrial = currentTrial+1; analyzeTrialPursuit; plotResultsPursuit');
     buttons.discardTrial = uicontrol(fig,'string','!Saccade errors!','Position',[0,360,100,30],...
-        'callback', 'errorStatus(currentTrial)=3; currentTrial = currentTrial+1; analyzeTrialPursuit; plotResultsPursuit');
+        'callback', 'errorStatus(trial.number)=3; currentTrial = currentTrial+1; analyzeTrialPursuit; plotResultsPursuit');
 end
 
 clear listboxDataFiles;

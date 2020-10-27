@@ -69,16 +69,22 @@ if strcmp(task, 'smoothPursuit') % for smooth pursuit
 elseif strcmp(task, 'predictivePursuit')% for predictive pursuit
     currentTrial = str2num(trialNo(end-6:end-4));
     trialLength = size(eyeData.X_filt,1);
-    target.onset = find(eyeData.timeStamp==targetPosition.time(currentTrial, 1));
+    target.onset = find(eyeData.timeStamp==targetPosition.time(currentTrial, 1)); % the ith frame in eyeData, relative frame position
+    if isempty(target.onset) % for sampling rate of 500Hz, this happens some time...
+        target.onset = find(eyeData.timeStamp==targetPosition.time(currentTrial, 1)+1);
+    end
     validIdx = find(targetPosition.time(currentTrial, :)~=0);
-    target.offset = find(eyeData.timeStamp==targetPosition.time(currentTrial, validIdx(end)))+1;
+    target.offset = find(eyeData.timeStamp==targetPosition.time(currentTrial, validIdx(end)))+1; % the ith frame in eyeData, relative frame position
+    if isempty(target.offset) % for sampling rate of 500Hz, this happens some time...
+        target.offset = find(eyeData.timeStamp==targetPosition.time(currentTrial, validIdx(end))+1)+1;
+    end
     
-    timePoints = [targetPosition.time(currentTrial, 1):1:targetPosition.time(currentTrial, validIdx(end))]; % interpolate the same length
+    timePoints = [eyeData.timeStamp(target.onset):1000/sampleRate:eyeData.timeStamp(target.offset-1)]; % interpolate the same length
     target.Xpxl = interp1(targetPosition.time(currentTrial, 1:validIdx(end)), targetPosition.posX(currentTrial, 1:validIdx(end)), timePoints);
     target.Ypxl = interp1(targetPosition.time(currentTrial, 1:validIdx(end)), targetPosition.posY(currentTrial, 1:validIdx(end)), timePoints);
     degXY= pixels2degrees(target.Xpxl-targetPosition.screenX(currentTrial, 1)/2, target.Ypxl-targetPosition.screenY(currentTrial, 1)/2); % right and down is positive, center is 0
     
-    target.Xdeg = [zeros(target.onset-1,1); degXY.degX'; zeros(trialLength-target.offset+1,1)];
+    target.Xdeg = [degXY.degX(1)*ones(target.onset-1,1); degXY.degX'; zeros(trialLength-target.offset+1,1)];
     target.Ydeg = [zeros(target.onset-1,1); -degXY.degY'; zeros(trialLength-target.offset+1,1)];% flip to make up positive
     
     target.Xpxl = [zeros(target.onset-1,1); target.Xpxl'; zeros(trialLength-target.offset+1,1)];
