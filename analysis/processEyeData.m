@@ -1,11 +1,11 @@
-function [eyeData] = processEyeData(eyeData)
+function [eyeData, sampleRate] = processEyeData(eyeData)
 % processEyeData (i.e. SOCSCALEXY) recomputes position from pixel to degrees of visual angle, and
 % flips traces, if applicable; filtering is also done here
 
 % file checked and corrected on 05/31/11
 
 %% set up filter
-sampleRate = 1000;
+sampleRate = 1000/(eyeData.timeStamp(2)-eyeData.timeStamp(1)); % need to calculate sample rate based on the actual data...
 filtFrequency = sampleRate/2;
 filtOrder = 2;
 filtCutoffPosition = 10;

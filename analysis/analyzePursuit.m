@@ -20,7 +20,11 @@ openLoopDuration = ms2frames(openLoopLength);
 pursuitOff = trial.target.offset; % may want to adjust if target has already disappeard 
 % analyze open-loop phase first
 startFrame = trial.target.onset; % if there is no pursuit onset we still want to analyze eye. movement quaility 
-endFrame = nanmin([(startFrame+openLoopDuration) trial.saccades.allOnsets(1)]);
+if isempty(trial.saccades.allOnsets)
+    endFrame = startFrame+openLoopDuration;
+else
+    endFrame = nanmin([(startFrame+openLoopDuration) trial.saccades.allOnsets(1)]);
+end
 % If subjects were fixating in the beginning (saccadeType = 2) or if purusit onset
 % was inside a saccade (saccadeType = -2) there is no open loop values
 % first analyze initial pursuit in X
