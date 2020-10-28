@@ -18,9 +18,9 @@ relevantFrames = middle+predecessor+successor == 3;
 
 % uncomment if you want to use 5 instead of 3 ceonsecutive frames
 %****
-% prepredecessor = [predecessor(2:end); 0];
-% sucsuccessor = [0; successor(1:end-1)];
-% relevantFrames = middle+predecessor+successor+sucsuccessor+prepredecessor == 5;
+prepredecessor = [predecessor(2:end); 0];
+sucsuccessor = [0; successor(1:end-1)];
+relevantFrames = middle+predecessor+successor+sucsuccessor+prepredecessor == 5;
 % %****
 
 relevantFramesDiff = diff(relevantFrames);
@@ -52,8 +52,8 @@ for i = 1:onsetLength
         continue
     end
     
-    onsets(i) = max(signSwitches(signSwitches <= speedOnsets(i)));
-    offsets(i) = min(signSwitches(signSwitches >= speedOffsets(i))-1); %the -1 is a subjective adjustment
+    onsets(i) = max(signSwitches(signSwitches < speedOnsets(i)));
+    offsets(i) = min(signSwitches(signSwitches > speedOffsets(i))-1); %the -1 is a subjective adjustment
     isMax(i) = speed(speedOnsets(i)) > 0;
     
 end

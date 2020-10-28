@@ -17,7 +17,7 @@ load([dataPath, 'excludeList.mat'])
 % excludeCount = 1;
 
 %% Loop over all subjects
-for i = 3:3%3:length(folderNames)
+for i = 3:length(folderNames)
     currentSubject{i-2} = folderNames(i).name;  
     
     currentFolder = [dataPath currentSubject{i-2}];
@@ -88,6 +88,27 @@ for i = 3:3%3:length(folderNames)
     
     cd(startFolder)
     [res, stat] = system([startFolder 'edf2asc -y -s -miss 9999 -nflags ' currentFolder '\*.edf']);
+    % now clean up the asc files, delete extra columns
+    ascfiles = dir([currentFolder '\*.asc']);    
+    cd(currentFolder)
+    % don't know how to modify the edf2asc command so just read in and
+    % write only the first four columns... to make sure there are no extra
+    % columns in the final asc file
+    for j = 1:length(ascfiles)
+        ascfile = ascfiles(j).name;
+        path = fullfile(currentFolder, ascfile);
+        fid = fopen(path);
+        allEntries = textscan(fid, '%s %s %s %s %*[^\n]');
+        fclose(fid);
+        
+        delete(path)
+        % then print a new asc file
+        fid = fopen(path,'w');            % Open the file
+        for ii=1:size(allEntries{1}, 1)
+            fprintf(fid,'%s %s %s %s\n', allEntries{1}{ii}, allEntries{2}{ii}, allEntries{3}{ii}, allEntries{4}{ii});
+        end
+        fclose(fid);
+    end
 end
 cd(dataPath)
 % save('excludeList.mat', 'excludeList')

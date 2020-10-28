@@ -159,7 +159,7 @@ elseif strcmp(name, 'predictivePursuit')
         'callback','clc; currentTrial = max(currentTrial-1,1);analyzeTrialPursuit;plotResultsPursuit');
     
     buttons.next = uicontrol(fig,'string','Next (0) >>','Position',[0,130,100,30],...
-        'callback','clc; errorStatus(trial.number)=0; currentTrial = currentTrial+1; analyzeTrialPursuit; plotResultsPursuit;finishButton');
+        'callback','clc; errorStatus(trial.number)=0; currentTrial = currentTrial+1; analyzeTrialPursuit; plotResultsPursuit');
     
     buttons.discardTrial = uicontrol(fig,'string','!Discard Trial!','Position',[0,300,100,30],...
         'callback', 'errorStatus(trial.number)=1; currentTrial = currentTrial+1; analyzeTrialPursuit; plotResultsPursuit');

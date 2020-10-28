@@ -10,9 +10,11 @@ filtFrequency = sampleRate/2;
 filtOrder = 2;
 filtCutoffPosition = 10;
 filtCutoffVelocity = 20;
+filtCutoffAcceleration = 20;
 
 [a,b] = butter(filtOrder,filtCutoffPosition/filtFrequency);
 [c,d] = butter(filtOrder,filtCutoffVelocity/filtFrequency);
+[e,f] = butter(filtOrder,filtCutoffAcceleration/filtFrequency);
 
 %% position
 eyeData.X_filt = filtfilt(a,b,eyeData.X);
@@ -33,10 +35,10 @@ eyeData.DDX = diff(eyeData.DX)*sampleRate;
 eyeData.DDY = diff(eyeData.DY)*sampleRate;
 
 DDX_tmp = diff(eyeData.DX_filt)*sampleRate;
-eyeData.DDX_filt = filtfilt(c,d,DDX_tmp);
+eyeData.DDX_filt = filtfilt(e,f,DDX_tmp);
 
 DDY_tmp = diff(eyeData.DY_filt)*sampleRate;
-eyeData.DDY_filt = filtfilt(c,d,DDY_tmp);
+eyeData.DDY_filt = filtfilt(e,f,DDY_tmp);
 
 %% jerk for detecting saccades and quick phases
 eyeData.DDDX = diff(eyeData.DDX_filt)*sampleRate;
