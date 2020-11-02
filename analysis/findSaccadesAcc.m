@@ -84,7 +84,7 @@ for idx = 1:length(binEdges)-1
     else
         peakAccs(idx, 1) = min(acceleration(startI:endI));
     end
-    peakIdx(idx, 1) = find(abs(acceleration)==abs(peakAccs(idx, 1)));
+    peakIdx(idx, 1) = find(abs(acceleration(startI:endI))==abs(peakAccs(idx, 1)))+startI-1;
 end
 
 largePeaks = abs(peakAccs)>threshold;
@@ -119,8 +119,8 @@ if ~isempty(overlapIdx)
         while peakI < offsetIntervals(overlapIdx(ii)+added)-onsetIntervals(overlapIdx(ii)+added)+1 % go through each peak within the interval to find correct pairs
             % check if the current peak is a tail peak but not the main
             % peak of a saccade
-            if peakValues(peakI)*peakValues(peakI+1)<0 && ...
-                    abs( (peakValues(peakI)+peakValues(peakI+1)) / ((peakValues(peakI)-peakValues(peakI+1))) )<0.1
+            if peakValues(peakI)*peakValues(peakI+1)<0 %&& ...
+%                     abs( (peakValues(peakI)+peakValues(peakI+1)) / ((peakValues(peakI)-peakValues(peakI+1))) )<0.1
                 % if opposite signs and the abs values don't differ too much, likely the main peaks of a saccade
                 newOnsets = [newOnsets; onsetIntervals(overlapIdx(ii)+added)+peakI-1];
                 peakI=peakI+2;

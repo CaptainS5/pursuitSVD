@@ -2,6 +2,9 @@
 %% Eye Data
 %  eye data have been converted in readEDF
 %  first step: read in converted eye data
+if currentTrial>size(eyeFiles, 1)
+    currentTrial=size(eyeFiles, 1); % do not go further if it's already the last trial
+end
 ascFile = eyeFiles(currentTrial,1).name;
 eyeData = readEyeData(ascFile, dataPath, currentSubject, analysisPath);
 [eyeData sampleRate]= processEyeData(eyeData); % equivalent to socscalexy

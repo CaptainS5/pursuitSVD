@@ -22,7 +22,9 @@ end
 %  (should be changed, if e.g. the projector was moved, i.e. the size of
 %  the projective are changed. Distance should be fixed, but double
 %  checking doesn't hurt
-currentTrial = 1;
+currentTrial = 1; % 
+% patients: A015, A037, A049, A063, A074, A081, E008, E090, H013, H058, H077, H096, I006, I029, I085, I087, O003, O030
+
 % % For SVD testing at icord:
 % sampleRate = 1000;
 screenSizeX = 40.6;
