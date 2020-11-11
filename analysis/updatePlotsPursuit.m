@@ -61,6 +61,7 @@ if strcmp(name, 'smoothPursuit')
     line([trial.target.offset trial.target.offset], [-25 25],'Color','k','LineStyle',':');
     
 elseif strcmp(name, 'predictivePursuit')
+    cutOffTime = 150; % ms
     %% position over time
     yRangePos = [-15 15];
     subplot(2,2,1,'replace');
@@ -89,7 +90,7 @@ elseif strcmp(name, 'predictivePursuit')
     % indicate target on and offset
     line([trial.target.onset trial.target.onset], yRangePos,'Color','k','LineStyle','--');
     line([trial.target.offset trial.target.offset], yRangePos,'Color','k','LineStyle','--');
-    line([trial.target.offset-100 trial.target.offset-100], yRangePos,'Color','k','LineStyle','-.');
+    line([trial.target.offset-cutOffTime trial.target.offset-cutOffTime], yRangePos,'Color','k','LineStyle','-.');
     % indicate blank start and end
     if trial.log.blank==1
         line([trial.log.blankStart trial.log.blankStart], yRangePos,'Color','b','LineStyle','--');
@@ -123,7 +124,7 @@ elseif strcmp(name, 'predictivePursuit')
     % indicate target on and offset
     line([trial.target.onset trial.target.onset], yRangeVel,'Color','k','LineStyle','--');
     line([trial.target.offset trial.target.offset], yRangeVel,'Color','k','LineStyle','--');
-    line([trial.target.offset-100 trial.target.offset-100], yRangeVel,'Color','k','LineStyle','-.');
+    line([trial.target.offset-cutOffTime trial.target.offset-cutOffTime], yRangeVel,'Color','k','LineStyle','-.');
     % indicate blank start and end
     if trial.log.blank==1
         line([trial.log.blankStart trial.log.blankStart], yRangeVel,'Color','b','LineStyle','--');

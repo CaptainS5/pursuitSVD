@@ -72,7 +72,14 @@ elseif strcmp(name, 'predictivePursuit')
     blankEndFrames = ms2frames(log.blank(2)*1000);
     trial.log.blankStart = target.onset+blankStartFrames;
     trial.log.blankEnd = target.onset+blankEndFrames;
-    if isempty(find(log.noBlank==trial.number))
+    % generate the trial number for no black... corresponding trials in
+    % each block!
+    noBlankTrialIdx = [];
+    for ii = 1:6 % 6 blocks in total
+        noBlankTrialIdx = [noBlankTrialIdx; log.noBlank'+(ii-1)*25];
+    end
+    
+    if isempty(find(noBlankTrialIdx==trial.number))
         trial.log.blank=1;
     else
         trial.log.blank=0;

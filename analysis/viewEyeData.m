@@ -12,7 +12,8 @@ switch choice
         dataPath = fullfile(pwd, '..','data\controls\');
 end
 % comment out unnecessary codes for choosing the task since we only focus on predictive pursuit
-% str = {'anti saccade', 'pro saccade', '1 minute saccades', 'smooth purusit', 'predictive pursuit'};
+% str = {'anti saccade', 'pro saccade', '1 minute saccades', 'smooth
+% purusit', 'predictive pursuit'};125
 % 
 % [s,v] = listdlg('PromptString','Select an eye movement test:',...
 %     'SelectionMode','single',...
@@ -22,8 +23,9 @@ end
 %  (should be changed, if e.g. the projector was moved, i.e. the size of
 %  the projective are changed. Distance should be fixed, but double
 %  checking doesn't hurt
-currentTrial = 1; % 
-% patients: A015, A037, A049, A063, A074, A081, E008, E090, H013, H058, H077, H096, I006, I029, I085, I087, O003, O030
+currentTrial = 1; %
+% controls: A014, A019, A082, E018, E029, E034, E061, E068, L010, L014, L089, O043, O044, O046, O065, R002, T060
+% patients: A015, A037, A049, A063, A074, A081, E008, E028, E090, H013, H058, H077, H096, I006, I029, I085, I087, O003, O030, O070
 
 % % For SVD testing at icord:
 % sampleRate = 1000;
@@ -33,7 +35,7 @@ screenResX = 1600;
 screenResY = 1200;
 distance = 83.5;
 
-saccadeThreshold = 25; %threshold for saccade sensitivity
+saccadeThreshold = 300; % acceleration threshold for saccade sensitivity
 microSaccadeThreshold = 5;
 %% Subject selection
 
@@ -169,6 +171,10 @@ elseif strcmp(name, 'predictivePursuit')
         'callback', 'errorStatus(trial.number)=2; currentTrial = currentTrial+1; analyzeTrialPursuit; plotResultsPursuit');
     buttons.discardTrial = uicontrol(fig,'string','!Saccade errors!','Position',[0,360,100,30],...
         'callback', 'errorStatus(trial.number)=3; currentTrial = currentTrial+1; analyzeTrialPursuit; plotResultsPursuit');
+    buttons.discardTrial = uicontrol(fig,'string','!Initial error!','Position',[0,390,100,30],...
+        'callback', 'errorStatus(trial.number)=-1; currentTrial = currentTrial+1; analyzeTrialPursuit; plotResultsPursuit'); % not tracking before occulusion
+    buttons.discardTrial = uicontrol(fig,'string','!Catch trial!','Position',[0,420,100,30],...
+        'callback', 'errorStatus(trial.number)=-5; currentTrial = currentTrial+1; analyzeTrialPursuit; plotResultsPursuit'); % not tracking before occulusion
 end
 
 clear listboxDataFiles;

@@ -18,7 +18,7 @@ trial = readoutTrialPursuit(ascFile, eyeData, currentSubject, target, log, name)
 
 %% find saccades
 %  jerk thresholds
-thresholdMoveDirection = 400;%evalin('base', 'saccadeThreshold');
+thresholdMoveDirection = evalin('base', 'saccadeThreshold');
 thresholdZero = 200;
 % % acceleration thresholds
 % thresholdMoveDirection = 500;%evalin('base', 'saccadeThreshold');

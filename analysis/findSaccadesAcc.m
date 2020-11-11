@@ -94,8 +94,8 @@ relevantPeaks = (largePeaks+successor==2);
 relevantPeaksDiff = diff(relevantPeaks);
 onsetIntervals = find(relevantPeaksDiff==1);
 offsetIntervals = find(relevantPeaksDiff==-1);
-if length(offsetIntervals)<length(onsetIntervals) % the last interval is an onset interval
-    offsetIntervals = [offsetIntervals; onsetIntervals(end)]; % making the same interval to be the offset of itself
+if length(offsetIntervals)<length(onsetIntervals) 
+    offsetIntervals = [offsetIntervals; length(relevantPeaksDiff)]; % not ending until the end, just make the last interval the end
 end
 % these are index of the peak intervals, not the time frames
 % if half of a saccade is at the beginning or the end, currently could
@@ -119,9 +119,9 @@ if ~isempty(overlapIdx)
         while peakI < offsetIntervals(overlapIdx(ii)+added)-onsetIntervals(overlapIdx(ii)+added)+1 % go through each peak within the interval to find correct pairs
             % check if the current peak is a tail peak but not the main
             % peak of a saccade
-            if peakValues(peakI)*peakValues(peakI+1)<0 %&& ...
-%                     abs( (peakValues(peakI)+peakValues(peakI+1)) / ((peakValues(peakI)-peakValues(peakI+1))) )<0.1
-                % if opposite signs and the abs values don't differ too much, likely the main peaks of a saccade
+            if peakValues(peakI)*peakValues(peakI+1)<0 && ...
+                    max(abs([peakValues(peakI) peakValues(peakI+1)])) / min(abs([peakValues(peakI) peakValues(peakI+1)]))<2
+% %                 if opposite signs and the abs values don't differ too much, likely the main peaks of a saccade
                 newOnsets = [newOnsets; onsetIntervals(overlapIdx(ii)+added)+peakI-1];
                 peakI=peakI+2;
             else
@@ -130,9 +130,15 @@ if ~isempty(overlapIdx)
                 % though as we will also take care of tail peaks later
             end
         end
+        if isempty(newOnsets) % if still empty, likely not saccade but bad signal and weird bumps, just exclude as a whole
+            newOnsets = onsetIntervals(overlapIdx(ii)+added);
+            newOffsets = offsetIntervals(overlapIdx(ii)+added);
+        else % add the recognized saccades, pairs of intervals
+            newOffsets = newOnsets+1;
+        end
         % add the new onset and offset
         onsetIntervals = [onsetIntervals(1:(overlapIdx(ii)+added-1)); newOnsets; onsetIntervals((overlapIdx(ii)+added+1):end)];
-        offsetIntervals = [offsetIntervals(1:(overlapIdx(ii)+added-1)); newOnsets+1; offsetIntervals((overlapIdx(ii)+added+1):end)];
+        offsetIntervals = [offsetIntervals(1:(overlapIdx(ii)+added-1)); newOffsets; offsetIntervals((overlapIdx(ii)+added+1):end)];
         added = added+length(newOnsets)-1;
     end
 end
@@ -149,8 +155,10 @@ for ii = 1:length(onsets)
     % but not the edge of this interval; this is mostly to avoid count in
     % the smooth part around saccades (sometimes it happens, acceleration
     % didn't change sign but only changed slope...)
-    onsetSearchPoint = peakIdx(onsetIntervals(ii))-20;
-    offsetSearchPoint = peakIdx(offsetIntervals(ii))+20;
+%     onsetSearchPoint = binEdges(onsetIntervals(ii));
+    offsetSearchPoint = binEdges(offsetIntervals(ii)+1)-1; % would not miss the last bit of a large saccade
+    onsetSearchPoint = peakIdx(onsetIntervals(ii))-20; % so would not include the immediate smooth part before a saccade
+%     offsetSearchPoint = peakIdx(offsetIntervals(ii))+20;
 
     % find the jerk swtich points around the acceleration intervals as
     % onset and offset
