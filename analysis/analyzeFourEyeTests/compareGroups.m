@@ -52,7 +52,7 @@ dependentVariables{1} = {'gain'};
 % dependentVariables{1}={'dependent variable 1 for pro-saccades', 'dependent variable 2 for pro-saccades', etc.}
 % dependentVariables{2}={'dependent variable 1 for pursuit', 'dependent variable 2 for pursuit', etc.}
 
-independentVariables{1} = {'track_direction', 'patient', ''}; 
+independentVariables{1} = {'speed', 'patient', 'track_direction'}; 
 % currently these are assumed to be categorical variables
 % Similarly, input the independent variables you want for each task 
 %   in different cells in independentVariables.
@@ -157,7 +157,10 @@ for taskN = 1:length(tasks)
     for dependentN = 1:length(dependentVariables{taskN})
         figure % create a new figure for each dependent variable
         % get the unique values for the independent variable(s) in each plot
-        if length(independentVariables{taskN})==1 || isempty(independentVariables{taskN}{end})
+        if length(independentVariables{taskN})==1 
+            var1All = unique(dataT.(independentVariables{taskN}{end}));
+            var2All = [];
+        elseif isempty(independentVariables{taskN}{end})
             var1All = unique(dataT.(independentVariables{taskN}{end-1}));
             var2All = [];
         else %
@@ -188,7 +191,11 @@ for taskN = 1:length(tasks)
             clear idx
             for var1N = 1:length(var1All)
                 if isempty(var2All)
-                    idx{1, var1N} = find(dataPlot.(independentVariables{taskN}{end-1})==var1All(var1N));
+                    if length(independentVariables{taskN})==1
+                        idx{1, var1N} = find(dataPlot.(independentVariables{taskN}{end})==var1All(var1N));
+                    else
+                        idx{1, var1N} = find(dataPlot.(independentVariables{taskN}{end-1})==var1All(var1N));
+                    end
                     yMean(1, var1N) = nanmean(dataPlot.(dependentVariables{taskN}{dependentN})(idx{1, var1N}, 1));
                     ySTD(1, var1N) = nanstd(dataPlot.(dependentVariables{taskN}{dependentN})(idx{1, var1N}, 1));
                 else
@@ -226,8 +233,12 @@ for taskN = 1:length(tasks)
                     legendNames{ii} = [independentVariables{taskN}{end}, ' ', num2str(var2All(ii))];
                 end
                 legend(legendNames, 'location', 'best')
-            end            
-            xlabel(independentVariables{taskN}{end-1})
+            end
+            if length(independentVariables{taskN})==1
+                xlabel(independentVariables{taskN}{end})
+            else
+                xlabel(independentVariables{taskN}{end-1})
+            end
             xticks(var1All)
             xticklabels(num2str(var1All))
             ylabel(dependentVariables{taskN}{dependentN})
