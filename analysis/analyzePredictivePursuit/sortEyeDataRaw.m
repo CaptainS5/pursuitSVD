@@ -5,7 +5,7 @@
 
 clear all; close all; clc
 
-load('validObservers.mat') % load the name list for all participants
+load('validObserversFinal.mat') % load the name list for all participants
 subStartI = [1];
 
 cd ..
