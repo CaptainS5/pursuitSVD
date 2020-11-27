@@ -1,5 +1,5 @@
 % revisit some controversal trials to mark errors
-% Xiuyun Wu, Nov/02/2020
+% Xiuyun Wu, Nov/02/2020; edited 11/27/2020
 clear all; clc; close all
 
 load('validObserversCompleteData.mat')
@@ -82,35 +82,33 @@ for subN = 1:size(subInfoOriginal, 1)
     load([errorFileRawFolder, 'Sub_', subInfoOriginal.name{subN}, '_errorFile.mat'])
     % first, "neutralize" all manually marked catch trials
     errorStatus(errorStatus==-5, 1) = 0;
-    % then, mark the default catch trials
-    errorStatus(catchTrialDefault, 1) = -5;
+    exclude = 0;    
     
-    % then, mark the confirmed catch trials
+    % get the idx of catch trials for the participant
     if all(logIdx(subN, :)==[7, 15, 21])
-        subInfo = [subInfo; subInfoOriginal(subN, :)];
-        catchIdx = [11, 15, 21, 31, 37, 47, 56, 64, 71, 83, 87, 95, 106, 115, 120, 132, 140, 146];
-        errorStatus(catchIdx, 1) = -5;
-        save([errorFileMainFolder, 'Sub_', subInfoOriginal.name{subN}, '_errorFile.mat'], 'errorStatus')
+        catchIdx = [catchTrialDefault, 11, 15, 21, 31, 37, 47, 56, 64, 71, 83, 87, 95, 106, 115, 120, 132, 140, 146];
     elseif all(logIdx(subN, :)==[6, 12, 16])
-        subInfo = [subInfo; subInfoOriginal(subN, :)];
-        catchIdx = [11, 15, 19, 39, 43, 47, 56, 60, 68, 85, 91, 95, 107, 111, 115, 131, 137, 141];
-        errorStatus(catchIdx, 1) = -5;
-        save([errorFileMainFolder, 'Sub_', subInfoOriginal.name{subN}, '_errorFile.mat'], 'errorStatus')
+        catchIdx = [catchTrialDefault, 11, 15, 19, 39, 43, 47, 56, 60, 68, 85, 91, 95, 107, 111, 115, 131, 137, 141];
     elseif all(logIdx(subN, :)==[11, 15, 21])
-        subInfo = [subInfo; subInfoOriginal(subN, :)];
-        catchIdx = [10, 15, 22, 31, 36, 47, 58, 65, 72, 83, 90, 95, 107, 112, 121, 136, 140, 146];
-        errorStatus(catchIdx, 1) = -5;
-        save([errorFileMainFolder, 'Sub_', subInfoOriginal.name{subN}, '_errorFile.mat'], 'errorStatus')
+        catchIdx = [catchTrialDefault, 10, 15, 22, 31, 36, 47, 58, 65, 72, 83, 90, 95, 107, 112, 121, 136, 140, 146];
     elseif all(logIdx(subN, :)==[10, 16, 20]) % only two people, rather confident about the results
-        subInfo = [subInfo; subInfoOriginal(subN, :)];
-        catchIdx = [7, 15, 22, 31, 38, 46, 61, 65, 69, 89, 93, 97, 106, 110, 118, 135, 141, 145];
-        errorStatus(catchIdx, 1) = -5;
-        save([errorFileMainFolder, 'Sub_', subInfoOriginal.name{subN}, '_errorFile.mat'], 'errorStatus')
+        catchIdx = [catchTrialDefault, 7, 15, 22, 31, 38, 46, 61, 65, 69, 89, 93, 97, 106, 110, 118, 135, 141, 145];
     else % exclude
+        exclude = 1;
+    end
+    
+    % then, mark the confirmed catch trials; only mark the "valid trials",
+    % ignore the invalid trials;
+    if exclude
         subExclude{counter} = subInfoOriginal.name{subN};
         counter = counter+1;
+    else
+        subInfo = [subInfo; subInfoOriginal(subN, :)];
+        idxT = find(errorStatus(catchIdx, 1)==0);
+        errorStatus(catchIdx(idxT), 1) = -5;
+        save([errorFileMainFolder, 'Sub_', subInfoOriginal.name{subN}, '_errorFile.mat'], 'errorStatus')
     end
     % eventually two controls were excluded, T060 and E068
 end
-save('validObserversCatchTrial.mat', 'subInfo')
-save('excludeObserversCatchTrial.mat', 'subExclude')
+% save('validObserversCatchTrial.mat', 'subInfo')
+% save('excludeObserversCatchTrial.mat', 'subExclude')
