@@ -4,7 +4,7 @@ clear all
 
 %% NEXT TIME FOR CONVERSION CHECK HOW MUCH HEADER SHOULD BE SKIPPED!!! IMPORTANT TO ACTUALLY GET THE RIGHT TARGET INDEX!!!
 startFolder = [pwd '\']; % where the edf2asc program is
-dataPath = fullfile(pwd,'..','data\patients\predict_pursuit_data\');
+dataPath = fullfile(pwd,'..','data\controls\predict_pursuit_data\');
 folderNames = dir(dataPath);
 if strcmp(folderNames(end).name(end-3:end), '.mat') % if already includes the excludeList file, ignore
     folderNames(end) = [];
@@ -17,8 +17,8 @@ load([dataPath, 'excludeList.mat'])
 % excludeCount = 1;
 
 %% Loop over all subjects
-for i = 3:length(folderNames)
-    currentSubject{i-2} = folderNames(i).name;  
+for i = 5:5%3:length(folderNames)
+    currentSubject{i-2} = folderNames(i).name;
     
     currentFolder = [dataPath currentSubject{i-2}];
     cd(currentFolder);
@@ -44,20 +44,20 @@ for i = 3:length(folderNames)
         continue
     end
     
-%     if isempty(matFiles) || size(edfFiles, 1)<150 ...
-%             || isempty(find(strcmp(matFileNames, '_predict.mat'))) % the
-%             first time, need to identify who should be excluded
-%         excludeList{excludeCount} = currentSubject{i-2};
-%         excludeCount = excludeCount+1;
-%         continue
-%     end
+    %     if isempty(matFiles) || size(edfFiles, 1)<150 ...
+    %             || isempty(find(strcmp(matFileNames, '_predict.mat'))) % the
+    %             first time, need to identify who should be excluded
+    %         excludeList{excludeCount} = currentSubject{i-2};
+    %         excludeCount = excludeCount+1;
+    %         continue
+    %     end
     
     [res, stat] = system([startFolder 'edf2asc -y ' currentFolder '\*.edf']);
     
     cd(startFolder);
     ascfiles = dir([currentFolder '\*.asc']);
     
-    targetPosition = struct();    
+    targetPosition = struct();
     for j = 1:length(ascfiles)
         ascfile = ascfiles(j).name;
         path = fullfile(currentFolder, ascfile);
@@ -75,7 +75,7 @@ for i = 3:length(folderNames)
                     targetPosition.screenY(trialN, 1) = str2num(allEntries{7}{lineN})+1;
                 elseif strcmp(allEntries{3}{lineN}, '!V') && strcmp(allEntries{4}{lineN}, 'TARGET_POS')
                     targetPosition.time(trialN, frameCount) = str2num(allEntries{2}{lineN});
-                    targetPosition.posX(trialN, frameCount) = str2num(allEntries{6}{lineN}(2:end-1)); 
+                    targetPosition.posX(trialN, frameCount) = str2num(allEntries{6}{lineN}(2:end-1));
                     targetPosition.posY(trialN, frameCount) = str2num(allEntries{7}{lineN}(1:end-1));
                     frameCount = frameCount+1;
                 end
@@ -89,7 +89,7 @@ for i = 3:length(folderNames)
     cd(startFolder)
     [res, stat] = system([startFolder 'edf2asc -y -s -miss 9999 -nflags ' currentFolder '\*.edf']);
     % now clean up the asc files, delete extra columns
-    ascfiles = dir([currentFolder '\*.asc']);    
+    ascfiles = dir([currentFolder '\*.asc']);
     cd(currentFolder)
     % don't know how to modify the edf2asc command so just read in and
     % write only the first four columns... to make sure there are no extra

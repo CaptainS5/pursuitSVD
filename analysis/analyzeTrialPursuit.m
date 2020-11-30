@@ -11,7 +11,7 @@ eyeData = readEyeData(ascFile, dataPath, currentSubject, analysisPath);
 
 %% Target data
 % set up target file
-target = createTargetData(targetPosition, ascFile, eyeData, str2double(currentSubject(end-2:end)), name);
+target = createTargetData(targetPosition, ascFile, eyeData, str2double(currentSubject(end-1:end)), name);
 
 %% setup trial
 trial = readoutTrialPursuit(ascFile, eyeData, currentSubject, target, log, name);
