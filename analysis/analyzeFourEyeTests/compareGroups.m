@@ -218,8 +218,12 @@ for taskN = 1:length(tasks)
             %             X = categorical(var1All);
             bP = bar(var1All, yMean, 'FaceColor', 'flat', 'EdgeColor', 'flat');
             if ~isempty(var2All)
-                for k = 1:size(yMean,2)
+                for k = 1:size(yMean, 1)
                     bP(k).CData = colorPlot(k, :);
+                end
+            else
+                for k = 1:size(yMean, 2)
+                    bP.CData(k, :) = colorPlot(k, :);
                 end
             end
             
@@ -235,7 +239,11 @@ for taskN = 1:length(tasks)
                 for jj = 1:nbars
                     % individual data points for each bar
                     X = xtips(jj).*ones(size(idx{ii, jj}));
-                    scatter(X, dataPlot.(dependentVariables{taskN}{dependentN})(idx{ii, jj}),'jitter','on','jitterAmount', 0.7*barWidth, 'MarkerEdgeColor', colorPlot(ii, :))
+                    if ~isempty(var2All)
+                        scatter(X, dataPlot.(dependentVariables{taskN}{dependentN})(idx{ii, jj}),'jitter','on','jitterAmount', 0.7*barWidth, 'MarkerEdgeColor', colorPlot(ii, :))
+                    else
+                        scatter(X, dataPlot.(dependentVariables{taskN}{dependentN})(idx{ii, jj}),'jitter','on','jitterAmount', 0.7*barWidth, 'MarkerEdgeColor', colorPlot(jj, :))
+                    end
                 end
             end
             
