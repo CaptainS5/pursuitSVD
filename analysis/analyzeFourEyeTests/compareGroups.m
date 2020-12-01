@@ -39,11 +39,11 @@ clear all; close all; clc
 % *"track_direction" in "pursuit", 'x' and 'y' are replaced by numbers: 
 %   0=x, 1=y
 
-tasks = {'micro-saccades'}; 
+tasks = {'pro-saccades'}; 
 % should be one or more (separate by comma or space) from the five tasks: 
 % 'pro-saccades', 'anti-saccades', 'micro-saccades', '1 minute saccades', 'pursuit'
 
-dependentVariables{1} = {'SNo'}; 
+dependentVariables{1} = {'latency'}; 
 % For each task you input to "tasks", following the same order, input
 %   the dependent variables (names as they appear in the excel sheet) to look at 
 %   in the corresponding cell in dependentVariables.
@@ -52,7 +52,7 @@ dependentVariables{1} = {'SNo'};
 % dependentVariables{1}={'dependent variable 1 for pro-saccades', 'dependent variable 2 for pro-saccades', etc.}
 % dependentVariables{2}={'dependent variable 1 for pursuit', 'dependent variable 2 for pursuit', etc.}
 
-independentVariables{1} = {'task', 'patient'}; 
+independentVariables{1} = {'patient'}; 
 % currently these are assumed to be categorical variables
 % Similarly, input the independent variables you want for each task 
 %   in different cells in independentVariables.
@@ -93,7 +93,7 @@ end
 % to the i_th name in sheetNames
 
 % prepare color for plotting individual dots
-colorPlot = [232 113 240; 15 204 255; 255 182 135; 137 126 255; 113 204 100]/255;
+colorPlot = [15 204 255; 255 182 135; 232 113 240; 137 126 255; 113 204 100]/255;
 
 %% visualize data, loop through each dependent variable in each task
 for taskN = 1:length(tasks)
@@ -217,8 +217,10 @@ for taskN = 1:length(tasks)
             % plot grouped bars
             %             X = categorical(var1All);
             bP = bar(var1All, yMean, 'FaceColor', 'flat', 'EdgeColor', 'flat');
-            for k = 1:size(yMean,2)
-                bP(k).CData = colorPlot(k, :);
+            if ~isempty(var2All)
+                for k = 1:size(yMean,2)
+                    bP(k).CData = colorPlot(k, :);
+                end
             end
             
             ngroups = size(yMean, 1);
