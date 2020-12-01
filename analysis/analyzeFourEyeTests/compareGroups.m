@@ -39,11 +39,11 @@ clear all; close all; clc
 % *"track_direction" in "pursuit", 'x' and 'y' are replaced by numbers: 
 %   0=x, 1=y
 
-tasks = {'pursuit'}; 
+tasks = {'micro-saccades'}; 
 % should be one or more (separate by comma or space) from the five tasks: 
 % 'pro-saccades', 'anti-saccades', 'micro-saccades', '1 minute saccades', 'pursuit'
 
-dependentVariables{1} = {'gain'}; 
+dependentVariables{1} = {'SNo'}; 
 % For each task you input to "tasks", following the same order, input
 %   the dependent variables (names as they appear in the excel sheet) to look at 
 %   in the corresponding cell in dependentVariables.
@@ -52,7 +52,7 @@ dependentVariables{1} = {'gain'};
 % dependentVariables{1}={'dependent variable 1 for pro-saccades', 'dependent variable 2 for pro-saccades', etc.}
 % dependentVariables{2}={'dependent variable 1 for pursuit', 'dependent variable 2 for pursuit', etc.}
 
-independentVariables{1} = {'speed', 'track_direction', 'patient'}; 
+independentVariables{1} = {'task', 'patient'}; 
 % currently these are assumed to be categorical variables
 % Similarly, input the independent variables you want for each task 
 %   in different cells in independentVariables.
@@ -118,6 +118,9 @@ for taskN = 1:length(tasks)
         dataT.track_direction(idx, 1) = 0;
         idx = find(strcmp(track_directionTemp, 'y'));
         dataT.track_direction(idx, 1) = 1;
+    elseif strcmp(tasks{taskN}, 'micro-saccades')
+        % get rid of the NaN task lines...
+        dataT(isnan(dataT.task), :) = [];
     end
     
     % manage the independent variables, also prepare for plotting
@@ -260,7 +263,7 @@ for taskN = 1:length(tasks)
                 independentNames = [independentNames, 'BY', independentVariables{taskN}{ii}];
             end
         end
-        fileName = [plotSavePath, tasks{taskN}, '_', dependentVariables{taskN}{dependentN}, '_', independentNames, '.pdf'];
+        fileName = [plotSavePath, tasks{taskN}, '_', dependentVariables{taskN}{dependentN}, '_', independentNames, '.jpg'];
         saveas(gcf, fileName)
     end
 end
