@@ -45,9 +45,13 @@ tasks = {'1 minute saccade', 'micro-saccades'};
 % should be one or more (separate by comma or space) from the five tasks: 
 % 'pro-saccades', 'anti-saccades', 'micro-saccades', '1 minute saccades', 'pursuit'
 
+<<<<<<< Updated upstream
 
 dependentVariables{1} = {'goalReached', 'accuracy', 'noCorrectiveSaccades', 'correctedAccuracy', 'correctivex_amplitude', 'noBlinks'}
 dependentVariables{2} = {'MSNo', 'MSCumulativeAmplitude', 'MSMeanAmp', 'SNo', 'SCumulativeAmplitude', 'SMeanAmplitude'}
+=======
+dependentVariables{1} = {'latency', 'velocity'}; 
+>>>>>>> Stashed changes
 % For each task you input to "tasks", following the same order, input
 %   the dependent variables (names as they appear in the excel sheet) to look at 
 %   in the corresponding cell in dependentVariables.
