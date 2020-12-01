@@ -221,16 +221,16 @@ for taskN = 1:length(tasks)
             ngroups = size(yMean, 1);
             nbars = size(yMean, 2);
             barWidth = min(0.8, nbars/(nbars+1.5))/(2*nbars); % I actually have no idea what this is...
-            for ii = 1:nbars
+            for ii = 1:ngroups
                 bP(ii).FaceAlpha = 0;
                 xtips = bP(ii).XEndPoints;
                 ytips = bP(ii).YEndPoints;
                 % errorbar
                 errorbar(xtips, ytips, ySTD(ii, :), 'k', 'linestyle', 'none');
-                for jj = 1:ngroups
+                for jj = 1:nbars
                     % individual data points for each bar
-                    X = xtips(jj).*ones(size(idx{jj, ii}));
-                    scatter(X, dataPlot.(dependentVariables{taskN}{dependentN})(idx{jj, ii}),'jitter','on','jitterAmount', 0.7*barWidth, 'MarkerEdgeColor', colorPlot(ii, :))
+                    X = xtips(jj).*ones(size(idx{ii, jj}));
+                    scatter(X, dataPlot.(dependentVariables{taskN}{dependentN})(idx{ii, jj}),'jitter','on','jitterAmount', 0.7*barWidth, 'MarkerEdgeColor', colorPlot(ii, :))
                 end
             end
             
@@ -255,8 +255,10 @@ for taskN = 1:length(tasks)
         
         % define the pdf name and save the figure
         independentNames = independentVariables{taskN}{1};
-        for ii = 2:length(independentVariables{taskN})
-            independentNames = [independentNames, 'BY', independentVariables{taskN}{ii}];
+        if length(independentVariables{taskN})>=2
+            for ii = 2:length(independentVariables{taskN})
+                independentNames = [independentNames, 'BY', independentVariables{taskN}{ii}];
+            end
         end
         fileName = [plotSavePath, tasks{taskN}, '_', dependentVariables{taskN}{dependentN}, '_', independentNames, '.pdf'];
         saveas(gcf, fileName)
