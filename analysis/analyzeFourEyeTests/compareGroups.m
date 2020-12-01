@@ -263,7 +263,7 @@ for taskN = 1:length(tasks)
                 independentNames = [independentNames, 'BY', independentVariables{taskN}{ii}];
             end
         end
-        fileName = [plotSavePath, tasks{taskN}, '_', dependentVariables{taskN}{dependentN}, '_', independentNames, '.jpg'];
+        fileName = [plotSavePath, tasks{taskN}, '_', dependentVariables{taskN}{dependentN}, '_', independentNames, '.emf'];
         saveas(gcf, fileName)
     end
 end
