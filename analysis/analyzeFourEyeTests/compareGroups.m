@@ -39,11 +39,12 @@ clear all; close all; clc
 % *"track_direction" in "pursuit", 'x' and 'y' are replaced by numbers: 
 %   0=x, 1=y
 
-tasks = {'pro-saccades'}; 
+tasks = {'pursuit', 'pro-saccades'}; 
 % should be one or more (separate by comma or space) from the five tasks: 
 % 'pro-saccades', 'anti-saccades', 'micro-saccades', '1 minute saccades', 'pursuit'
 
-dependentVariables{1} = {'latency'}; 
+dependentVariables{1} = {'gain'};
+dependentVariables{2} = {'latency'}; 
 % For each task you input to "tasks", following the same order, input
 %   the dependent variables (names as they appear in the excel sheet) to look at 
 %   in the corresponding cell in dependentVariables.
@@ -52,7 +53,8 @@ dependentVariables{1} = {'latency'};
 % dependentVariables{1}={'dependent variable 1 for pro-saccades', 'dependent variable 2 for pro-saccades', etc.}
 % dependentVariables{2}={'dependent variable 1 for pursuit', 'dependent variable 2 for pursuit', etc.}
 
-independentVariables{1} = {'patient'}; 
+independentVariables{1} = {'speed', 'track_direction', 'patient'}; 
+independentVariables{2} = {'patient'}; 
 % currently these are assumed to be categorical variables
 % Similarly, input the independent variables you want for each task 
 %   in different cells in independentVariables.
@@ -85,9 +87,9 @@ analysisFolder = pwd;
 dataPath = fullfile('..\..\results\organized excel sheets\');
 plotSavePath = fullfile('..\..\results\');
 
-sheetNames = sheetnames([dataPath, 'SVD_eyeMovement_results.xlsx']);
+sheetNames = sheetnames([dataPath, 'SVD_eyeMovement_results_newPursuitResults.xlsx']);
 for ii=1:length(sheetNames)
-    data{ii} = readtable([dataPath, 'SVD_eyeMovement_results.xlsx'], 'sheet', ii);
+    data{ii} = readtable([dataPath, 'SVD_eyeMovement_results_newPursuitResults.xlsx'], 'sheet', ii);
 end
 % the i_th cell in data contains the i_th sheet in the excel, corresponding
 % to the i_th name in sheetNames
@@ -95,8 +97,11 @@ end
 % prepare color for plotting individual dots
 colorPlot = [15 204 255; 255 182 135; 232 113 240; 137 126 255; 113 204 100]/255;
 
+excludeList = {'E034', 'A082', 'E028', 'O070'};
+% participants with weird speed in the pursuit task, and also abnormal latency in saccade tasks
+
 %% visualize data, loop through each dependent variable in each task
-for taskN = 1:length(tasks)
+for taskN = 2:length(tasks)
     % initialize
     independentAll = {}; % unique values of each independent variable
     levelIndependentAll = []; % number of levels for each independent variable
@@ -107,10 +112,17 @@ for taskN = 1:length(tasks)
     % find the correct cell in data
     cellIdx = find(strcmp(sheetNames, tasks{taskN}));
     dataT = data{cellIdx}; % all data for the current task
+    % for all tasks, exclude participants with weird speed in the pursuit
+    % task (they would also have abnormal latency in saccade tasks)
+    for excludeN = 1:length(excludeList)
+        idx = find(strcmp(dataT.subjectID, excludeList{excludeN}));
+        dataT(idx, :) = [];
+    end
+    
     % for pursuit, exclude data with the speed other than 9/22
     if strcmp(tasks{taskN}, 'pursuit')
-        idxT = find(dataT.speed~=9 & dataT.speed~=22);
-        dataT(idxT, :) = [];
+%         idxT = find(dataT.speed~=9 & dataT.speed~=22);
+%         dataT(idxT, :) = [];
         % also replace direction strings with numbers
         track_directionTemp = dataT.track_direction;
         dataT.track_direction = [];

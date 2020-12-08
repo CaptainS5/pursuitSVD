@@ -51,9 +51,8 @@ for i = 1:onsetLength
     if speedOnsets(i) < min(signSwitches) || speedOffsets(i) > max(signSwitches) 
         continue
     end
-    
-    onsets(i) = max(signSwitches(signSwitches < speedOnsets(i)));
-    offsets(i) = min(signSwitches(signSwitches > speedOffsets(i))-1); %the -1 is a subjective adjustment
+    onsets(i) = max(signSwitches(signSwitches <= speedOnsets(i)));
+    offsets(i) = min(signSwitches(signSwitches >= speedOffsets(i))-1); %the -1 is a subjective adjustment
     isMax(i) = speed(speedOnsets(i)) > 0;
     
 end

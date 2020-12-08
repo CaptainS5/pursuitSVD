@@ -1,15 +1,17 @@
 %% Automatic analysis for eye movement test battery
 %  Always update at the same time as viewEyeData!!!
 %% General definitions of the set up here!
-sampleRate = 1000;
+% For SVD testing at icord:
+% sampleRate = 1000;
 screenSizeX = 40.6;
 screenSizeY = 30.4;
 screenResX = 1600; 
 screenResY = 1200;
 distance = 83.5;
 
-saccadeThreshold = 30; %threshold for saccade sensitivity
+saccadeThreshold = 30; % 30 for the four eye tasks
 microSaccadeThreshold = 5;
+
 %% chose patients or controls here
 choice = questdlg('Which subject group do you want to analyze?', ...
 	'subject type', ...
@@ -18,7 +20,7 @@ population = choice;
 analysisPath = pwd;
 dataPath = fullfile(pwd, '..','data\' , population);
 %% select eye movement battery to run through
-str = {'anti saccade', 'pro saccade', '1 minute saccades', 'smooth purusit', 'predictive pursuit'};
+str = {'anti saccade', 'pro saccade', '1 minute saccades', 'smooth pursuit', 'predictive pursuit'};
 
 [s,v] = listdlg('PromptString','Select an eye movement test:',...
     'SelectionMode','single',...
@@ -45,14 +47,22 @@ resultPath = fullfile(pwd, name, '\', population);
 %% create list of all subjects
 folderNames = dir(dataPath);
 currentSubject = {};
+excludeList = {'E034', 'A082', 'E028', 'O070'}; % those with different speeds in pursuit, also weird saccade latencies
 
 %% Loop over all subjects
-
 for i = 3:length(folderNames)
     currentSubject{i-2} = folderNames(i).name;
     
+    if find(strcmp(excludeList, currentSubject{i-2}))
+        currentSubject{i-2}
+        continue
+    end
+    
     currentFolder = [dataPath currentSubject{i-2}];
-    cd(currentFolder);    
+    % define screen size and distance based on where they were tested
+    subjectId = str2double(currentSubject{i-2}(2:3));
+    cd(currentFolder); 
+    % I'm inside the subject folder and can now load relevant files
     numTrials = length(dir('*.asc'));
     eyeFiles = dir('*.asc');
     matFiles = dir('*.mat');
@@ -65,7 +75,7 @@ for i = 3:length(folderNames)
     else 
        targetSelectionAdj = []; 
     end
-    if strcmp(name, 'minuteSaccade')
+     if strcmp(name, 'minuteSaccade')
         load('targetOnset.mat');
         cd(analysisPath);
         saccadeTarget = load('saccadeTarget.mat');
@@ -78,13 +88,12 @@ for i = 3:length(folderNames)
         cd(analysisPath);
     end
 
-    % I'm inside the subject folder and can now loop over all trials
-    % analyze for each trial
+    % loop over all trials analyze for each trial
     for currentTrial = 1:numTrials
         if ~strcmp(name, 'smoothPursuit')
             [results.trial] = automaticAnalysisSaccade(eyeFiles, currentTrial, currentSubject{i-2}, analysisPath, dataPath, targetOnset, saccadeTarget, targetSelectionAdj);
         else
-            [results.trial] = automaticAnalysisPursuit(eyeFiles, currentTrial, currentSubject{i-2}, analysisPath, dataPath, targetPosition);
+            [results.trial] = automaticAnalysisPursuit(eyeFiles, currentTrial, currentSubject{i-2}, analysisPath, dataPath, targetPosition, name);
         end
         analysisResults(:,currentTrial) = results;
     end

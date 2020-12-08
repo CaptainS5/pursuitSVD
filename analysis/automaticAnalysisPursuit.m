@@ -1,21 +1,21 @@
-function trial = automaticAnalysisPursuit(eyeFiles, currentTrial, currentSubject, analysisPath, dataPath, targetPosition)
+function trial = automaticAnalysisPursuit(eyeFiles, currentTrial, currentSubject, analysisPath, dataPath, targetPosition, task)
 %% Eye Data
 %  eye data have been converted in readEDF
 %  first step: read in converted eye data
 ascFile = eyeFiles(currentTrial,1).name;
 eyeData = readEyeData(ascFile, dataPath, currentSubject, analysisPath);
-eyeData = processEyeData(eyeData); % equivalent to socscalexy
+[eyeData sampleRate]= processEyeData(eyeData); % equivalent to socscalexy
 
 %% Target data
 % set up target file
-target = createTargetData(targetPosition, ascFile, eyeData, str2double(currentSubject(end-2:end)));
+target = createTargetData(targetPosition, ascFile, eyeData, str2double(currentSubject(end-1:end)), task); %(targetPosition, ascFile, eyeData);
 
 if length(target.cycle.maxima) ~= 5
     trial = [];
 else
     
     %% setup trial
-    trial = readoutTrialPursuit(ascFile, eyeData, currentSubject, target);
+    trial = readoutTrialPursuit(ascFile, eyeData, currentSubject, target, [], task);
     
     %% find saccades
     thresholdMoveDirection = 10;%evalin('base', 'saccadeThreshold');
@@ -35,7 +35,9 @@ else
     %% remove saccades (include blinks
     trial = removeBlinksSaccades(trial);
     
+    %% find pursuit onset
+    pursuit = findPursuit(trial); 
     %% analyze pursuit
-    trial = analyzePursuit(trial);
+    trial = analyzePursuit(trial, pursuit);
 end
 end

@@ -12,19 +12,21 @@
 % output: pursuit --> structure containing relevant all open and closed
 %                     loop pursuit measures
 
-function [trial] = analyzePursuit(trial)
+function [trial] = analyzePursuit(trial, pursuit)
+
 trial.pursuit = [];
+if pursuit.onset >= trial.saccades.onsets(1)
+    trial.pursuit.onset = trial.saccades.offsets(1)+1;
+else
+    trial.pursuit.onset = pursuit.onset;
+end
 % define the window you want to analyze pursuit in
 openLoopLength = 140;
 openLoopDuration = ms2frames(openLoopLength);
 pursuitOff = trial.target.offset; % may want to adjust if target has already disappeard 
 % analyze open-loop phase first
-startFrame = trial.target.onset; % if there is no pursuit onset we still want to analyze eye. movement quaility 
-if isempty(trial.saccades.allOnsets)
-    endFrame = startFrame+openLoopDuration;
-else
-    endFrame = nanmin([(startFrame+openLoopDuration) trial.saccades.allOnsets(1)]);
-end
+startFrame = nanmin([trial.target.onset trial.pursuit.onset]); % if there is no pursuit onset we still want to analyze eye. movement quaility 
+endFrame = nanmin([(startFrame+openLoopDuration) trial.saccades.allOnsets(1)]);
 % If subjects were fixating in the beginning (saccadeType = 2) or if purusit onset
 % was inside a saccade (saccadeType = -2) there is no open loop values
 % first analyze initial pursuit in X
@@ -110,25 +112,34 @@ end
 
 % now analyze closed loop
 % if there is no pursuit onset, use stimulus onset as onset 
-endFrame = pursuitOff;
-closedLoop = startFrame:endFrame;
+bin1 = trial.target.onset+openLoopLength:trial.target.minima(1)-openLoopLength;
+bins = [];
+for i = 1:length(trial.target.minima)
+    currentBin = trial.target.minima(i)+openLoopLength:trial.target.maxima(i)-openLoopLength;
+    bins = [bins; currentBin];
+end
+closedLoop = [bin1; bins];
+clear bin1 bins
 % calculate gain first
 speedXY_noSac = sqrt((trial.DX_noSac).^2 + (trial.DY_noSac).^2);
 absoluteVel = sqrt(trial.target.Xvel.^2 + trial.target.Yvel.^2);
 idx = absoluteVel < 0.05;
 absoluteVel(idx) = NaN;
 pursuitGain = (speedXY_noSac(closedLoop))./absoluteVel(closedLoop);
+zScore = zscore(pursuitGain(~isnan(pursuitGain)));
+pursuitGain((zScore > 3 | zScore < -3)) = NaN;
 pursuit.gain= nanmean(pursuitGain);
-if length(pursuitGain) < ms2frames(40)
+if pursuit.gain > 2.5
     pursuit.gain = NaN;
 end
+
 % calculate position error
-horizontalError = trial.X_noSac(startFrame:endFrame)-trial.target.X(startFrame:endFrame);
-verticalError = trial.target.Y(startFrame:endFrame)-trial.Y_noSac(startFrame:endFrame);
+horizontalError = trial.X_noSac(closedLoop)-trial.target.X(closedLoop);
+verticalError = trial.target.Y(closedLoop)-trial.Y_noSac(closedLoop);
 pursuit.positionError = nanmean(sqrt(horizontalError.^2+ verticalError.^2));
 % calculate velocity error
-pursuit.velocityError = nanmean(sqrt((trial.target.Xvel(startFrame:endFrame) - trial.DX_noSac(startFrame:endFrame)).^2 + ...
-    (trial.target.Yvel(startFrame:endFrame) - trial.DY_noSac(startFrame:endFrame)).^2)); %auch 2D
+pursuit.velocityError = nanmean(sqrt((trial.target.Xvel(closedLoop) - trial.DX_noSac(closedLoop)).^2 + ...
+    (trial.target.Yvel(closedLoop) - trial.DY_noSac(closedLoop)).^2)); %auch 2D
 
 trial.pursuit = pursuit;
 end
