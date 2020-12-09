@@ -43,7 +43,7 @@ tasks = {'pursuit', 'pro-saccades'};
 % should be one or more (separate by comma or space) from the five tasks: 
 % 'pro-saccades', 'anti-saccades', 'micro-saccades', '1 minute saccades', 'pursuit'
 
-dependentVariables{1} = {'gain'};
+dependentVariables{1} = {'gain' 'positionError'};
 dependentVariables{2} = {'latency'}; 
 % For each task you input to "tasks", following the same order, input
 %   the dependent variables (names as they appear in the excel sheet) to look at 
@@ -53,7 +53,7 @@ dependentVariables{2} = {'latency'};
 % dependentVariables{1}={'dependent variable 1 for pro-saccades', 'dependent variable 2 for pro-saccades', etc.}
 % dependentVariables{2}={'dependent variable 1 for pursuit', 'dependent variable 2 for pursuit', etc.}
 
-independentVariables{1} = {'speed', 'track_direction', 'patient'}; 
+independentVariables{1} = {'targetSpeed', 'trackDirection', 'patient'}; 
 independentVariables{2} = {'patient'}; 
 % currently these are assumed to be categorical variables
 % Similarly, input the independent variables you want for each task 
@@ -101,7 +101,7 @@ excludeList = {'E034', 'A082', 'E028', 'O070'};
 % participants with weird speed in the pursuit task, and also abnormal latency in saccade tasks
 
 %% visualize data, loop through each dependent variable in each task
-for taskN = 2:length(tasks)
+for taskN = 1:1%:length(tasks)
     % initialize
     independentAll = {}; % unique values of each independent variable
     levelIndependentAll = []; % number of levels for each independent variable
@@ -124,12 +124,12 @@ for taskN = 2:length(tasks)
 %         idxT = find(dataT.speed~=9 & dataT.speed~=22);
 %         dataT(idxT, :) = [];
         % also replace direction strings with numbers
-        track_directionTemp = dataT.track_direction;
-        dataT.track_direction = [];
-        idx = find(strcmp(track_directionTemp, 'x'));
-        dataT.track_direction(idx, 1) = 0;
-        idx = find(strcmp(track_directionTemp, 'y'));
-        dataT.track_direction(idx, 1) = 1;
+        trackDirectionTemp = dataT.trackDirection;
+        dataT.trackDirection = [];
+        idx = find(strcmp(trackDirectionTemp, 'x'));
+        dataT.trackDirection(idx, 1) = 0;
+        idx = find(strcmp(trackDirectionTemp, 'y'));
+        dataT.trackDirection(idx, 1) = 1;
     elseif strcmp(tasks{taskN}, 'micro-saccades')
         % get rid of the NaN task lines...
         dataT(isnan(dataT.task), :) = [];
