@@ -35,15 +35,12 @@ clear all; close all; clc
 %       'patient', ''}, then you will have one subplot for horizontal
 %       tracking, one subplot for vertical tracking, each with two bars of
 %       patients/controls.
-%
-% *"track_direction" in "pursuit", 'x' and 'y' are replaced by numbers: 
-%   0=x, 1=y
 
 tasks = {'pursuit', 'pro-saccades'}; 
 % should be one or more (separate by comma or space) from the five tasks: 
 % 'pro-saccades', 'anti-saccades', 'micro-saccades', '1 minute saccades', 'pursuit'
 
-dependentVariables{1} = {'gain' 'positionError'};
+dependentVariables{1} = {'gain'};
 dependentVariables{2} = {'latency'}; 
 % For each task you input to "tasks", following the same order, input
 %   the dependent variables (names as they appear in the excel sheet) to look at 
@@ -101,7 +98,7 @@ excludeList = {'E034', 'A082', 'E028', 'O070'};
 % participants with weird speed in the pursuit task, and also abnormal latency in saccade tasks
 
 %% visualize data, loop through each dependent variable in each task
-for taskN = 1:1%:length(tasks)
+for taskN = 1:length(tasks)
     % initialize
     independentAll = {}; % unique values of each independent variable
     levelIndependentAll = []; % number of levels for each independent variable
@@ -121,15 +118,8 @@ for taskN = 1:1%:length(tasks)
     
     % for pursuit, exclude data with the speed other than 9/22
     if strcmp(tasks{taskN}, 'pursuit')
-%         idxT = find(dataT.speed~=9 & dataT.speed~=22);
-%         dataT(idxT, :) = [];
-        % also replace direction strings with numbers
-        trackDirectionTemp = dataT.trackDirection;
-        dataT.trackDirection = [];
-        idx = find(strcmp(trackDirectionTemp, 'x'));
-        dataT.trackDirection(idx, 1) = 0;
-        idx = find(strcmp(trackDirectionTemp, 'y'));
-        dataT.trackDirection(idx, 1) = 1;
+        %         idxT = find(dataT.speed~=9 & dataT.speed~=22);
+        %         dataT(idxT, :) = [];
     elseif strcmp(tasks{taskN}, 'micro-saccades')
         % get rid of the NaN task lines...
         dataT(isnan(dataT.task), :) = [];
@@ -199,7 +189,7 @@ for taskN = 1:1%:length(tasks)
                 titleName = [independentVariables{taskN}{1}, ' ', num2str(independentGroups{subplotN, 1})];
                 if size(independentGroups, 2)>1
                     for ii = 2:size(independentGroups, 2)
-                        titleName = [titleName, ', ', independentVariables{taskN}{ii+1}, num2str(independentGroups{subplotN, ii})];
+                        titleName = [titleName, ', ', independentVariables{taskN}{ii}, num2str(independentGroups{subplotN, ii})];
                     end
                 end
                 title(titleName)
