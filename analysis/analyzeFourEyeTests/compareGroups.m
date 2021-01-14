@@ -240,11 +240,11 @@ for taskN = 1:length(tasks)
                 errorbar(xtips, ytips, ySTD(:, ii)', 'k', 'linestyle', 'none');
                 for jj = 1:ngroups
                     % individual data points for each bar
-                    X = xtips(jj).*ones(size(idx{ii, jj}));
+                    X = xtips(jj).*ones(size(idx{jj, ii}));
                     if ~isempty(var2All)
-                        scatter(X, dataPlot.(dependentVariables{taskN}{dependentN})(idx{ii, jj}),'jitter','on','jitterAmount', 0.7*barWidth, 'MarkerEdgeColor', colorPlot(ii, :))
+                        scatter(X, dataPlot.(dependentVariables{taskN}{dependentN})(idx{jj, ii}),'jitter','on','jitterAmount', 0.7*barWidth, 'MarkerEdgeColor', colorPlot(ii, :))
                     else
-                        scatter(X, dataPlot.(dependentVariables{taskN}{dependentN})(idx{ii, jj}),'jitter','on','jitterAmount', 0.7*barWidth, 'MarkerEdgeColor', colorPlot(jj, :))
+                        scatter(X, dataPlot.(dependentVariables{taskN}{dependentN})(idx{jj, ii}),'jitter','on','jitterAmount', 0.7*barWidth, 'MarkerEdgeColor', colorPlot(jj, :))
                     end
                 end
             end
