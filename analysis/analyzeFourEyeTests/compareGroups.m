@@ -2,6 +2,7 @@
 % the excel sheets; visualize and do individual t-tests to compare
 % difference between the patient and control group
 % currently just do the plotting
+% you may need to change the directory for the data path in line 85-86
 
 % drafted by XiuyunWu, 10/09/2020; edited 11/24/2020. xiuyunwu5@gmail.com
 clear all; close all; clc
@@ -36,7 +37,7 @@ clear all; close all; clc
 %       tracking, one subplot for vertical tracking, each with two bars of
 %       patients/controls.
 
-tasks = {'pursuit', 'pro-saccades'}; 
+tasks = {'pursuit'}; 
 % should be one or more (separate by comma or space) from the five tasks: 
 % 'pro-saccades', 'anti-saccades', 'micro-saccades', '1 minute saccades', 'pursuit'
 
@@ -208,16 +209,15 @@ for taskN = 1:length(tasks)
                     ySTD(1, var1N) = nanstd(dataPlot.(dependentVariables{taskN}{dependentN})(idx{1, var1N}, 1));
                 else
                     for var2N = 1:length(var2All)
-                        idx{var2N, var1N} = find(dataPlot.(independentVariables{taskN}{end-1})==var1All(var1N) & ...
+                        idx{var1N, var2N} = find(dataPlot.(independentVariables{taskN}{end-1})==var1All(var1N) & ...
                             dataPlot.(independentVariables{taskN}{end})==var2All(var2N));
-                        yMean(var2N, var1N) = nanmean(dataPlot.(dependentVariables{taskN}{dependentN})(idx{var2N, var1N}, 1));
-                        ySTD(var2N, var1N) = nanstd(dataPlot.(dependentVariables{taskN}{dependentN})(idx{var2N, var1N}, 1));
+                        yMean(var1N, var2N) = nanmean(dataPlot.(dependentVariables{taskN}{dependentN})(idx{var1N, var2N}, 1));
+                        ySTD(var1N, var2N) = nanstd(dataPlot.(dependentVariables{taskN}{dependentN})(idx{var1N, var2N}, 1));
                     end
                 end
             end
             
             % plot grouped bars
-            %             X = categorical(var1All);
             bP = bar(var1All, yMean, 'FaceColor', 'flat', 'EdgeColor', 'flat');
             if ~isempty(var2All)
                 for k = 1:size(yMean, 1)
@@ -232,13 +232,13 @@ for taskN = 1:length(tasks)
             ngroups = size(yMean, 1);
             nbars = size(yMean, 2);
             barWidth = min(0.8, nbars/(nbars+1.5))/(2*nbars); % I actually have no idea what this is...
-            for ii = 1:ngroups
+            for ii = 1:nbars
                 bP(ii).FaceAlpha = 0;
                 xtips = bP(ii).XEndPoints;
                 ytips = bP(ii).YEndPoints;
                 % errorbar
-                errorbar(xtips, ytips, ySTD(ii, :), 'k', 'linestyle', 'none');
-                for jj = 1:nbars
+                errorbar(xtips, ytips, ySTD(:, ii)', 'k', 'linestyle', 'none');
+                for jj = 1:ngroups
                     % individual data points for each bar
                     X = xtips(jj).*ones(size(idx{ii, jj}));
                     if ~isempty(var2All)

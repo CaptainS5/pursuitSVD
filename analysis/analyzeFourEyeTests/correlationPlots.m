@@ -3,6 +3,7 @@
 %   and cognitive/clinical scores, with fitted correlation line and stats
 % Note that we are simply using Pearson correlation now, could modify if
 %   necessary
+% you may need to change the directory for the data path in line 69-70
 
 % XiuyunWu, edited 12/11/2020. xiuyunwu5@gmail.com
 clear all; close all; clc
